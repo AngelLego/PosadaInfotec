@@ -81,12 +81,12 @@ class CollectionBasket {
     }
     
     draw(ctx) {
-        // Dibujar canasta
+        // Dibujar canasta navideña
         ctx.fillStyle = '#8B4513';
         ctx.fillRect(this.x, this.y, this.width, this.height);
         
-        // Dibujar borde
-        ctx.strokeStyle = '#654321';
+        // Dibujar borde dorado navideño
+        ctx.strokeStyle = '#FFD700';
         ctx.lineWidth = 3;
         ctx.strokeRect(this.x, this.y, this.width, this.height);
         
@@ -100,6 +100,18 @@ class CollectionBasket {
             ctx.lineTo(lineX, this.y + this.height);
             ctx.stroke();
         }
+        
+        // Agregar decoración navideña en la canasta
+        ctx.fillStyle = '#ff6b6b';
+        ctx.fillRect(this.x + 5, this.y - 10, this.width - 10, 8);
+        
+        // Pequeños adornos
+        ctx.fillStyle = '#4CAF50';
+        ctx.beginPath();
+        ctx.arc(this.x + 15, this.y - 6, 3, 0, Math.PI * 2);
+        ctx.arc(this.x + 35, this.y - 6, 3, 0, Math.PI * 2);
+        ctx.arc(this.x + 55, this.y - 6, 3, 0, Math.PI * 2);
+        ctx.fill();
     }
 }
 
@@ -295,7 +307,14 @@ class InfotecGame {
             php: new Image(),
             html: new Image(),
             css: new Image(),
-            carbon: new Image()
+            carbon: new Image(),
+            // Objetos navideños
+            gift: new Image(),
+            star: new Image(),
+            bell: new Image(),
+            candy: new Image(),
+            snowflake: new Image(),
+            grinch: new Image()
         };
         
         // Logo de INFOTEC desde la carpeta imagenes
@@ -358,6 +377,14 @@ class InfotecGame {
         this.images.html = createSprite('#e34f26', 'HTML', 'white', 10);
         this.images.css = createSprite('#1572b6', 'CSS', 'white', 12);
         this.images.carbon = createSprite('#333333', '💨', 'white', 20, true);
+        
+        // Crear objetos navideños
+        this.images.gift = createSprite('#ff6b6b', '🎁', 'white', 24, true);
+        this.images.star = createSprite('#FFD700', '⭐', 'white', 24, true);
+        this.images.bell = createSprite('#FFD700', '🔔', 'white', 24, true);
+        this.images.candy = createSprite('#ff6b6b', '🍭', 'white', 24, true);
+        this.images.snowflake = createSprite('#87CEEB', '❄️', 'white', 24, true);
+        this.images.grinch = createSprite('#4CAF50', '👹', 'white', 24, true);
     }
     
     adjustBrightness(color, amount) {
@@ -691,20 +718,31 @@ class InfotecGame {
         switch (obj.type) {
             case 'programming':
                 this.scoreManager.addScore(obj.points);
-                // Efecto visual de puntos
                 this.showPointsEffect(obj.x, obj.y, `+${obj.points}`, '#4CAF50');
                 break;
             case 'infotec':
                 const bonusPoints = obj.points * 2;
                 this.scoreManager.addScore(bonusPoints);
-                this.showPointsEffect(obj.x, obj.y, `+${bonusPoints} BONUS!`, '#00d4ff');
+                this.showPointsEffect(obj.x, obj.y, `+${bonusPoints} INFOTEC!`, '#00d4ff');
+                break;
+            case 'christmas':
+                const christmasPoints = obj.points + Math.floor(Math.random() * 10); // Bonus aleatorio navideño
+                this.scoreManager.addScore(christmasPoints);
+                this.showPointsEffect(obj.x, obj.y, `+${christmasPoints} 🎄`, '#FFD700');
                 break;
             case 'carbon':
                 const gameOver = this.scoreManager.addCarbon();
-                this.showPointsEffect(obj.x, obj.y, 'CARBÓN!', '#ff6b6b');
+                this.showPointsEffect(obj.x, obj.y, '💨 CARBÓN!', '#ff6b6b');
                 if (gameOver) {
                     this.endGame('¡Demasiado carbón recolectado!');
                 }
+                break;
+            case 'grinch':
+                // El Grinch roba puntos!
+                const stolenPoints = Math.min(50, this.scoreManager.score);
+                this.scoreManager.score = Math.max(0, this.scoreManager.score - stolenPoints);
+                this.scoreManager.updateScoreDisplay();
+                this.showPointsEffect(obj.x, obj.y, `👹 -${stolenPoints}!`, '#8B0000');
                 break;
         }
     }
@@ -728,18 +766,31 @@ class InfotecGame {
         if (!this.gameRunning || this.gamePaused) return;
         
         const objectTypes = [
-            { type: 'programming', sprite: this.images.javascript, points: 10, weight: 15 },
-            { type: 'programming', sprite: this.images.python, points: 15, weight: 15 },
-            { type: 'programming', sprite: this.images.java, points: 12, weight: 15 },
-            { type: 'programming', sprite: this.images.react, points: 18, weight: 12 },
-            { type: 'programming', sprite: this.images.nodejs, points: 14, weight: 12 },
-            { type: 'programming', sprite: this.images.csharp, points: 16, weight: 10 },
-            { type: 'programming', sprite: this.images.cpp, points: 20, weight: 8 },
-            { type: 'programming', sprite: this.images.php, points: 8, weight: 10 },
-            { type: 'programming', sprite: this.images.html, points: 6, weight: 12 },
-            { type: 'programming', sprite: this.images.css, points: 8, weight: 12 },
-            { type: 'infotec', sprite: this.images.infotec, points: 50, weight: 8 },
-            { type: 'carbon', sprite: this.images.carbon, points: 0, weight: 50 } // Incrementado aún más el peso del carbón
+            // Logos de programación
+            { type: 'programming', sprite: this.images.javascript, points: 10, weight: 12 },
+            { type: 'programming', sprite: this.images.python, points: 15, weight: 12 },
+            { type: 'programming', sprite: this.images.java, points: 12, weight: 12 },
+            { type: 'programming', sprite: this.images.react, points: 18, weight: 10 },
+            { type: 'programming', sprite: this.images.nodejs, points: 14, weight: 10 },
+            { type: 'programming', sprite: this.images.csharp, points: 16, weight: 8 },
+            { type: 'programming', sprite: this.images.cpp, points: 20, weight: 6 },
+            { type: 'programming', sprite: this.images.php, points: 8, weight: 8 },
+            { type: 'programming', sprite: this.images.html, points: 6, weight: 10 },
+            { type: 'programming', sprite: this.images.css, points: 8, weight: 10 },
+            
+            // Objetos especiales
+            { type: 'infotec', sprite: this.images.infotec, points: 50, weight: 6 },
+            
+            // Objetos navideños (buenos)
+            { type: 'christmas', sprite: this.images.gift, points: 25, weight: 15 },
+            { type: 'christmas', sprite: this.images.star, points: 30, weight: 12 },
+            { type: 'christmas', sprite: this.images.bell, points: 20, weight: 15 },
+            { type: 'christmas', sprite: this.images.candy, points: 15, weight: 18 },
+            { type: 'christmas', sprite: this.images.snowflake, points: 10, weight: 20 },
+            
+            // Objetos negativos
+            { type: 'carbon', sprite: this.images.carbon, points: 0, weight: 35 },
+            { type: 'grinch', sprite: this.images.grinch, points: 0, weight: 15 } // Nuevo objeto negativo navideño
         ];
         
         // Seleccionar tipo de objeto basado en pesos
@@ -771,16 +822,20 @@ class InfotecGame {
     }
     
     draw() {
-        // Fondo con gradiente mejorado
+        // Fondo navideño con gradiente
         const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
-        gradient.addColorStop(0, '#87CEEB');
-        gradient.addColorStop(0.5, '#4682B4');
-        gradient.addColorStop(1, '#2F4F4F');
+        gradient.addColorStop(0, '#1e3a8a'); // Azul nocturno
+        gradient.addColorStop(0.3, '#2563eb'); // Azul medio
+        gradient.addColorStop(0.7, '#0d4f3c'); // Verde navideño
+        gradient.addColorStop(1, '#1a5c4a'); // Verde oscuro
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
-        // Dibujar nubes de fondo
-        this.drawClouds();
+        // Dibujar nieve cayendo
+        this.drawSnow();
+        
+        // Dibujar árboles navideños de fondo
+        this.drawChristmasTrees();
         
         // Dibujar canasta con sombra
         this.drawBasketWithShadow();
@@ -799,25 +854,79 @@ class InfotecGame {
         this.drawControlsHint();
     }
     
-    drawClouds() {
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    drawSnow() {
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
         
-        // Nubes simples
-        const clouds = [
-            { x: 100, y: 80, size: 30 },
-            { x: 300, y: 120, size: 25 },
-            { x: 600, y: 90, size: 35 },
-            { x: 50, y: 200, size: 20 },
-            { x: 700, y: 180, size: 28 }
+        // Copos de nieve animados
+        const time = Date.now() * 0.001;
+        for (let i = 0; i < 50; i++) {
+            const x = (i * 137.5 + time * 50) % this.canvas.width;
+            const y = (i * 73.3 + time * 30) % this.canvas.height;
+            const size = 1 + (i % 3);
+            
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, size, 0, Math.PI * 2);
+            this.ctx.fill();
+        }
+    }
+    
+    drawChristmasTrees() {
+        // Árboles navideños de fondo
+        const trees = [
+            { x: 50, y: 400, size: 0.8 },
+            { x: 200, y: 420, size: 1.0 },
+            { x: 600, y: 410, size: 0.9 },
+            { x: 750, y: 430, size: 0.7 }
         ];
         
-        clouds.forEach(cloud => {
-            this.ctx.beginPath();
-            this.ctx.arc(cloud.x, cloud.y, cloud.size, 0, Math.PI * 2);
-            this.ctx.arc(cloud.x + cloud.size * 0.8, cloud.y, cloud.size * 0.8, 0, Math.PI * 2);
-            this.ctx.arc(cloud.x + cloud.size * 1.6, cloud.y, cloud.size, 0, Math.PI * 2);
-            this.ctx.fill();
+        trees.forEach(tree => {
+            this.drawChristmasTree(tree.x, tree.y, tree.size);
         });
+    }
+    
+    drawChristmasTree(x, y, scale) {
+        this.ctx.save();
+        this.ctx.translate(x, y);
+        this.ctx.scale(scale, scale);
+        
+        // Tronco
+        this.ctx.fillStyle = '#8B4513';
+        this.ctx.fillRect(-10, 0, 20, 40);
+        
+        // Capas del árbol
+        this.ctx.fillStyle = '#0d4f3c';
+        
+        // Capa inferior
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, -60);
+        this.ctx.lineTo(-40, 0);
+        this.ctx.lineTo(40, 0);
+        this.ctx.closePath();
+        this.ctx.fill();
+        
+        // Capa media
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, -80);
+        this.ctx.lineTo(-30, -20);
+        this.ctx.lineTo(30, -20);
+        this.ctx.closePath();
+        this.ctx.fill();
+        
+        // Capa superior
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, -100);
+        this.ctx.lineTo(-20, -40);
+        this.ctx.lineTo(20, -40);
+        this.ctx.closePath();
+        this.ctx.fill();
+        
+        // Estrella en la punta
+        this.ctx.fillStyle = '#FFD700';
+        this.ctx.font = '16px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('⭐', 0, -95);
+        
+        this.ctx.restore();
     }
     
     drawBasketWithShadow() {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INFOTEC - Juego de Recolección</title>
+    <title>🎄 INFOTEC - Posada Navideña 2025 🎅
     <link rel="icon" type="image/png" href="imagenes/Infotec-logo.png">
     <link rel="shortcut icon" type="image/png" href="imagenes/Infotec-logo.png">
     <style>
@@ -17,19 +17,49 @@
             margin: 0;
             padding: 20px;
             font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            background: linear-gradient(135deg, #0d4f3c 0%, #1a5c4a 30%, #2d1b69 70%, #1e3a8a 100%);
             color: white;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
             overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Efectos de nieve */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, white, transparent),
+                radial-gradient(2px 2px at 40px 70px, white, transparent),
+                radial-gradient(1px 1px at 90px 40px, white, transparent),
+                radial-gradient(1px 1px at 130px 80px, white, transparent),
+                radial-gradient(2px 2px at 160px 30px, white, transparent);
+            background-repeat: repeat;
+            background-size: 200px 100px;
+            animation: snow 10s linear infinite;
+            pointer-events: none;
+            opacity: 0.6;
+            z-index: 1;
+        }
+        
+        @keyframes snow {
+            0% { transform: translateY(-100px); }
+            100% { transform: translateY(100vh); }
         }
         
         .container {
             text-align: center;
             max-width: 900px;
             width: 100%;
+            position: relative;
+            z-index: 2;
         }
         
         h1 {
@@ -37,17 +67,20 @@
             font-weight: 900;
             font-size: 2.5em;
             margin-bottom: 30px;
-            text-shadow: 0 0 20px #00d4ff, 2px 2px 4px rgba(0,0,0,0.8);
-            background: linear-gradient(45deg, #00d4ff, #ff6b6b, #4ecdc4);
-            background-size: 200% 200%;
+            text-shadow: 0 0 20px #ff6b6b, 2px 2px 4px rgba(0,0,0,0.8);
+            background: linear-gradient(45deg, #ff6b6b, #4CAF50, #FFD700, #ff6b6b);
+            background-size: 300% 300%;
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: gradientShift 3s ease-in-out infinite;
+            animation: christmasGlow 4s ease-in-out infinite;
         }
         
-        @keyframes gradientShift {
+        @keyframes christmasGlow {
             0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+            25% { background-position: 100% 50%; }
+            50% { background-position: 200% 50%; }
+            75% { background-position: 300% 50%; }
         }
         
         #gameCanvas {
@@ -521,12 +554,79 @@
             margin: 5px 0;
             font-size: 14px;
         }
+        
+        /* Footer de créditos */
+        .footer {
+            margin-top: 40px;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .footer h3 {
+            color: #FFD700;
+            font-family: 'Orbitron', monospace;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px #FFD700;
+        }
+        
+        .developers {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .developer {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-width: 200px;
+        }
+        
+        .developer h4 {
+            color: #4CAF50;
+            margin-bottom: 10px;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .developer p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #ccc;
+        }
+        
+        .christmas-decoration {
+            font-size: 1.5em;
+            margin: 0 10px;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .footer-note {
+            font-size: 12px;
+            color: #888;
+            margin-top: 15px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <img src="imagenes/Infotec-logo.png" alt="INFOTEC Logo" class="header-logo">
-        <h1>🎮 Juego de Recolección INFOTEC</h1>
+        <h1>🎄 POSADA NAVIDEÑA INFOTEC 2024 🎅</h1>
         
         <!-- Menú de registro -->
         <div id="registrationMenu" class="menu">
@@ -586,10 +686,11 @@
         <div id="gameInstructions" class="instructions" style="display: none;">
             <h3>🎮 Instrucciones del Juego</h3>
             <ul>
-                <li><strong>Objetivo:</strong> Recolecta logos de programación y el logo de INFOTEC</li>
-                <li><strong>Evita:</strong> Los objetos de carbón (máximo 5)</li>
-                <li><strong>Tiempo:</strong> Tienes 1 minuto para obtener el mayor puntaje</li>
-                <li><strong>Bonus:</strong> El logo de INFOTEC otorga puntos dobles</li>
+                <li><strong>🎯 Objetivo:</strong> Recolecta logos de programación y objetos navideños</li>
+                <li><strong>🎄 Especiales:</strong> Regalos, estrellas, campanas, dulces y copos de nieve</li>
+                <li><strong>🏫 INFOTEC:</strong> Logo institucional otorga puntos dobles</li>
+                <li><strong>⚠️ Evita:</strong> Carbón (máximo 5) y el Grinch (roba puntos)</li>
+                <li><strong>⏰ Tiempo:</strong> 1 minuto de diversión navideña</li>
             </ul>
             
             <div class="control-instructions">
@@ -605,24 +706,28 @@
                     <span>+10 pts</span>
                 </div>
                 <div class="logo-item">
-                    <div style="width: 30px; height: 30px; background: #3776ab; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">PY</div>
-                    <span>+15 pts</span>
-                </div>
-                <div class="logo-item">
-                    <div style="width: 30px; height: 30px; background: #ed8b00; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">☕</div>
-                    <span>+12 pts</span>
-                </div>
-                <div class="logo-item">
-                    <div style="width: 30px; height: 30px; background: #61dafb; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: black;">⚛</div>
-                    <span>+18 pts</span>
-                </div>
-                <div class="logo-item">
                     <div style="width: 30px; height: 30px; background: #0066cc; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">🏫</div>
                     <span>BONUS x2</span>
                 </div>
                 <div class="logo-item">
+                    <div style="width: 30px; height: 30px; background: #ff6b6b; border-radius: 4px; display: flex; align-items: center; justify-content: center;">🎁</div>
+                    <span>+25 pts</span>
+                </div>
+                <div class="logo-item">
+                    <div style="width: 30px; height: 30px; background: #FFD700; border-radius: 4px; display: flex; align-items: center; justify-content: center;">⭐</div>
+                    <span>+30 pts</span>
+                </div>
+                <div class="logo-item">
+                    <div style="width: 30px; height: 30px; background: #87CEEB; border-radius: 4px; display: flex; align-items: center; justify-content: center;">❄️</div>
+                    <span>+10 pts</span>
+                </div>
+                <div class="logo-item">
                     <div style="width: 30px; height: 30px; background: #333; border-radius: 4px; display: flex; align-items: center; justify-content: center;">💨</div>
                     <span>¡EVITAR!</span>
+                </div>
+                <div class="logo-item">
+                    <div style="width: 30px; height: 30px; background: #4CAF50; border-radius: 4px; display: flex; align-items: center; justify-content: center;">👹</div>
+                    <span>¡ROBA PUNTOS!</span>
                 </div>
             </div>
         </div>
@@ -700,6 +805,38 @@
                     <button id="backToMenuBtn">🏠 Menú Principal</button>
                 </div>
             </div>
+        </div>
+        
+        <!-- Footer de créditos -->
+        <div class="footer">
+            <h3>🎄 Desarrollado con ❤️ para la Posada Navideña INFOTEC 2024 🎄</h3>
+            
+            <div class="developers">
+                <div class="developer">
+                    <h4>🎅 Miguel Ángel Trujillo Monrroy</h4>
+                    <p>💻 Desarrollador Principal</p>
+                    <p>🎮 Diseño de Juego</p>
+                    <p>⚡ Lógica y Funcionalidades</p>
+                </div>
+                
+                <div class="developer">
+                    <h4>🤶 Rachel Soledad Martínez</h4>
+                    <p>🎨 Diseño UX/UI</p>
+                    <p>📊 Sistema de Estadísticas</p>
+                    <p>✨ Experiencia de Usuario</p>
+                </div>
+            </div>
+            
+            <div>
+                <span class="christmas-decoration">🎁</span>
+                <span>¡Felices Fiestas y Próspero 2025!</span>
+                <span class="christmas-decoration">🎁</span>
+            </div>
+            
+            <p class="footer-note">
+                Desarrollado especialmente para la comunidad educativa de INFOTEC<br>
+                Diciembre 2024 - Con tecnología web moderna y mucho espíritu navideño
+            </p>
         </div>
     </div>
     
