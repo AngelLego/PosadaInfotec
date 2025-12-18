@@ -1,0 +1,12 @@
+# Archivos que no necesita Vercel
+node_modules
+.git
+.gitignore
+README.md
+DEPLOY.md
+logos/
+test-setup.js
+game.test.js
+*.test.js
+coverage/
+.nyc_output/

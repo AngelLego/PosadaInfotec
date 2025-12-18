@@ -1,0 +1,36 @@
+{
+  "name": "infotec-juego-recoleccion",
+  "version": "1.0.0",
+  "description": "Juego de recolección de logos para docentes de INFOTEC",
+  "main": "index.html",
+  "scripts": {
+    "dev": "http-server -p 3000",
+    "build": "echo 'Static site - no build needed'",
+    "start": "http-server -p 8080",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "game",
+    "infotec",
+    "education",
+    "javascript",
+    "html5",
+    "canvas"
+  ],
+  "author": "INFOTEC",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "jest-environment-jsdom": "^29.0.0",
+    "fast-check": "^3.0.0",
+    "http-server": "^14.0.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": ["<rootDir>/test-setup.js"]
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

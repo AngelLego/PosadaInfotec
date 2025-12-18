@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generador de Logos</title>
+</head>
+<body>
+    <canvas id="canvas" width="64" height="64"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Función para crear logos
+        function createLogo(bgColor, text, textColor = 'white', fontSize = 20) {
+            ctx.clearRect(0, 0, 64, 64);
+            
+            // Fondo con gradiente
+            const gradient = ctx.createLinearGradient(0, 0, 64, 64);
+            gradient.addColorStop(0, bgColor);
+            gradient.addColorStop(1, adjustBrightness(bgColor, -20));
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 64, 64);
+            
+            // Borde
+            ctx.strokeStyle = adjustBrightness(bgColor, -40);
+            ctx.lineWidth = 2;
+            ctx.strokeRect(1, 1, 62, 62);
+            
+            // Texto
+            ctx.fillStyle = textColor;
+            ctx.font = `bold ${fontSize}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, 32, 32);
+            
+            return canvas.toDataURL();
+        }
+        
+        function adjustBrightness(color, amount) {
+            const num = parseInt(color.replace("#", ""), 16);
+            const amt = Math.round(2.55 * amount);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+        }
+        
+        // Crear logos y mostrar URLs
+        const logos = [
+            { name: 'javascript', bg: '#f7df1e', text: 'JS', color: 'black' },
+            { name: 'python', bg: '#3776ab', text: 'PY', color: 'white' },
+            { name: 'java', bg: '#ed8b00', text: '☕', color: 'white', size: 24 },
+            { name: 'react', bg: '#61dafb', text: '⚛', color: 'black', size: 28 },
+            { name: 'nodejs', bg: '#339933', text: 'JS', color: 'white' },
+            { name: 'csharp', bg: '#239120', text: 'C#', color: 'white' },
+            { name: 'cpp', bg: '#00599c', text: 'C++', color: 'white', size: 16 },
+            { name: 'php', bg: '#777bb4', text: 'PHP', color: 'white', size: 14 },
+            { name: 'html', bg: '#e34f26', text: 'HTML', color: 'white', size: 12 },
+            { name: 'css', bg: '#1572b6', text: 'CSS', color: 'white', size: 14 },
+            { name: 'carbon', bg: '#333333', text: '💨', color: 'white', size: 24 }
+        ];
+        
+        console.log('// Logos generados:');
+        logos.forEach(logo => {
+            const dataUrl = createLogo(logo.bg, logo.text, logo.color, logo.size || 20);
+            console.log(`${logo.name}: '${dataUrl}',`);
+        });
+    </script>
+</body>
+</html>

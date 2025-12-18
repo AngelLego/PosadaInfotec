@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INFOTEC - Juego de Recolección</title>
+    <link rel="icon" type="image/png" href="imagenes/Infotec-logo.png">
+    <link rel="shortcut icon" type="image/png" href="imagenes/Infotec-logo.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500;700&display=swap');
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 900px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px #00d4ff, 2px 2px 4px rgba(0,0,0,0.8);
+            background: linear-gradient(45deg, #00d4ff, #ff6b6b, #4ecdc4);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        #gameCanvas {
+            border: 4px solid #00d4ff;
+            border-radius: 15px;
+            background: linear-gradient(180deg, #87CEEB 0%, #4682B4 100%);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5), inset 0 0 20px rgba(0,0,0,0.2);
+            display: none;
+            position: relative;
+        }
+        
+        .menu {
+            background: rgba(255,255,255,0.05);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 1.1em;
+            color: #00d4ff;
+        }
+        
+        input, select {
+            padding: 15px;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            font-size: 16px;
+            width: 250px;
+            margin: 5px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+        
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 8px;
+            min-width: 150px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        button:not(:disabled) {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        button:not(:disabled):hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+        
+        button:disabled {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+            cursor: not-allowed;
+        }
+        
+        .game-info {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr auto 1fr;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .info-label {
+            font-size: 0.9em;
+            color: #00d4ff;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 1.4em;
+            font-weight: 700;
+            text-shadow: 0 0 10px currentColor;
+        }
+        
+        .timer {
+            color: #ff6b6b;
+        }
+        
+        .timer.warning {
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .carbon-counter {
+            color: #ff6b6b;
+        }
+        
+        .carbon-counter.danger {
+            animation: shake 0.5s infinite;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .stats-container {
+            display: none;
+            background: rgba(255,255,255,0.05);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-top: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        
+        .error {
+            color: #ff6b6b;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid #ff6b6b;
+        }
+        
+        .success {
+            color: #51cf66;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(81, 207, 102, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid #51cf66;
+        }
+        
+        .game-controls {
+            margin-top: 15px;
+        }
+        
+        .game-controls button {
+            margin: 0 10px;
+        }
+        
+        .instructions {
+            background: rgba(0, 212, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+        
+        .instructions h3 {
+            margin-top: 0;
+            color: #00d4ff;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .instructions ul {
+            text-align: left;
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 5px;
+        }
+        
+        .logo-preview {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .logo-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            min-width: 80px;
+        }
+        
+        .logo-item img {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 5px;
+        }
+        
+        .logo-item span {
+            font-size: 0.8em;
+            color: #00d4ff;
+        }
+        
+        /* Estilos para pantalla de resultados */
+        .game-over-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 3px solid #00d4ff;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.5);
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .result-card h2 {
+            font-family: 'Orbitron', monospace;
+            color: #00d4ff;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px #00d4ff;
+        }
+        
+        .result-logo {
+            width: 150px;
+            height: auto;
+            margin: 20px 0;
+            filter: drop-shadow(0 0 10px #00d4ff);
+        }
+        
+        .result-stats {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .result-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+            font-size: 1.2em;
+        }
+        
+        .result-stat:last-child {
+            border-bottom: none;
+        }
+        
+        .result-stat-label {
+            color: #00d4ff;
+            font-weight: 500;
+        }
+        
+        .result-stat-value {
+            color: white;
+            font-weight: 700;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .result-buttons {
+            margin-top: 30px;
+        }
+        
+        .result-buttons button {
+            margin: 10px;
+        }
+        
+        /* Estilos para tabla de estadísticas */
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .stats-table th {
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+            padding: 15px;
+            text-align: left;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+        }
+        
+        .stats-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stats-table tr:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+        
+        .stats-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .rank-badge {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            font-weight: bold;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .rank-1 {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+        }
+        
+        .rank-2 {
+            background: linear-gradient(45deg, #C0C0C0, #808080);
+            color: #000;
+        }
+        
+        .rank-3 {
+            background: linear-gradient(45deg, #CD7F32, #8B4513);
+            color: #fff;
+        }
+        
+        .rank-other {
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+        }
+        
+        /* Logo de INFOTEC en el header */
+        .header-logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 15px rgba(0, 212, 255, 0.6));
+            animation: logoGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes logoGlow {
+            from {
+                filter: drop-shadow(0 0 15px rgba(0, 212, 255, 0.6));
+            }
+            to {
+                filter: drop-shadow(0 0 25px rgba(0, 212, 255, 0.9));
+            }
+        }
+        
+        .reset-stats-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff5252) !important;
+            font-size: 14px !important;
+            min-width: 120px !important;
+            margin-top: 20px;
+        }
+        
+        .reset-stats-btn:hover {
+            background: linear-gradient(45deg, #ff5252, #ff1744) !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="imagenes/Infotec-logo.png" alt="INFOTEC Logo" class="header-logo">
+        <h1>🎮 Juego de Recolección INFOTEC</h1>
+        
+        <!-- Menú de registro -->
+        <div id="registrationMenu" class="menu">
+            <h2>Registro de Docente</h2>
+            <div class="form-group">
+                <label for="teacherName">Nombre del Docente:</label>
+                <input type="text" id="teacherName" placeholder="Ingresa tu nombre">
+            </div>
+            <div class="form-group">
+                <label for="teacherGeneration">Generación (1-12):</label>
+                <select id="teacherGeneration">
+                    <option value="">Selecciona tu generación</option>
+                    <option value="6">Generación 6</option>
+                    <option value="7">Generación 7</option>
+                    <option value="8">Generación 8</option>
+                    <option value="9">Generación 9</option>
+                    <option value="10">Generación 10</option>
+                    <option value="11">Generación 11</option>
+                    <option value="12">Generación 12</option>
+                </select>
+            </div>
+            <button id="registerBtn">Registrarse</button>
+            <button id="startGameBtn" disabled>Iniciar Juego</button>
+            <button id="showStatsBtn">📊 Ver Estadísticas</button>
+            <button id="resetStatsBtn" class="reset-stats-btn">🗑️ Restablecer Datos</button>
+            <div id="registrationMessage"></div>
+        </div>
+        
+        <!-- Información del juego -->
+        <div id="gameInfo" class="game-info" style="display: none;">
+            <div class="info-item">
+                <div class="info-label">JUGADOR</div>
+                <div class="info-value" id="currentPlayer"></div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">PUNTAJE</div>
+                <div class="info-value" id="currentScore">0</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">TIEMPO</div>
+                <div class="info-value timer" id="gameTimer">1:00</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">CARBONES</div>
+                <div class="info-value carbon-counter" id="carbonCount">0/5</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">NIVEL</div>
+                <div class="info-value" id="gameLevel">1</div>
+            </div>
+        </div>
+        
+        <!-- Canvas del juego -->
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        
+        <!-- Instrucciones del juego -->
+        <div id="gameInstructions" class="instructions" style="display: none;">
+            <h3>🎮 Instrucciones del Juego</h3>
+            <ul>
+                <li><strong>Movimiento:</strong> Usa las flechas ← → o las teclas A/D</li>
+                <li><strong>Objetivo:</strong> Recolecta logos de programación y el logo de INFOTEC</li>
+                <li><strong>Evita:</strong> Los objetos de carbón (máximo 5)</li>
+                <li><strong>Tiempo:</strong> Tienes 1 minuto para obtener el mayor puntaje</li>
+                <li><strong>Bonus:</strong> El logo de INFOTEC otorga puntos dobles</li>
+            </ul>
+            <div class="logo-preview">
+                <div class="logo-item">
+                    <div style="width: 30px; height: 30px; background: #f7df1e; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: black;">JS</div>
+                    <span>+10 pts</span>
+                </div>
+                <div class="logo-item">
+                    <div style="width: 30px; height: 30px; background: #3776ab; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">PY</div>
+                    <span>+15 pts</span>
+                </div>
+                <div class="logo-item">
+                    <div style="width: 30px; height: 30px; background: #ed8b00; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">☕</div>
+                    <span>+12 pts</span>
+                </div>
+                <div class="logo-item">
+                    <div style="width: 30px; height: 30px; background: #61dafb; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: black;">⚛</div>
+                    <span>+18 pts</span>
+                </div>
+                <div class="logo-item">
+                    <div style="width: 30px; height: 30px; background: #0066cc; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">🏫</div>
+                    <span>BONUS x2</span>
+                </div>
+                <div class="logo-item">
+                    <div style="width: 30px; height: 30px; background: #333; border-radius: 4px; display: flex; align-items: center; justify-content: center;">💨</div>
+                    <span>¡EVITAR!</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Controles del juego -->
+        <div id="gameControls" class="game-controls" style="display: none;">
+            <button id="pauseBtn">⏸️ PAUSAR</button>
+            <button id="endGameBtn">🛑 TERMINAR</button>
+        </div>
+        
+        <!-- Menú de estadísticas -->
+        <div id="statsMenu" class="menu" style="display: none;">
+            <h2>Estadísticas</h2>
+            <button id="showIndividualStats">Mis Estadísticas</button>
+            <button id="showGenerationStats">Estadísticas por Generación</button>
+            <button id="showRankings">Rankings</button>
+            <button id="backToMenu">Volver al Menú</button>
+        </div>
+        
+        <!-- Container de estadísticas -->
+        <div id="statsContainer" class="stats-container">
+            <div id="statsContent"></div>
+        </div>
+        
+        <!-- Pantalla de resultados del juego -->
+        <div id="gameOverScreen" class="game-over-screen">
+            <div class="result-card">
+                <h2 id="gameOverTitle">¡Juego Terminado!</h2>
+                <img id="resultLogo" class="result-logo" src="imagenes/Infotec-logo.png" alt="INFOTEC Logo">
+                
+                <div class="result-stats">
+                    <div class="result-stat">
+                        <span class="result-stat-label">👤 Jugador:</span>
+                        <span class="result-stat-value" id="resultPlayer"></span>
+                    </div>
+                    <div class="result-stat">
+                        <span class="result-stat-label">🎓 Generación:</span>
+                        <span class="result-stat-value" id="resultGeneration"></span>
+                    </div>
+                    <div class="result-stat">
+                        <span class="result-stat-label">🎯 Puntaje Base:</span>
+                        <span class="result-stat-value" id="resultScore"></span>
+                    </div>
+                    <div class="result-stat">
+                        <span class="result-stat-label">⏰ Bonus Tiempo:</span>
+                        <span class="result-stat-value" id="resultTimeBonus"></span>
+                    </div>
+                    <div class="result-stat">
+                        <span class="result-stat-label">🏆 Puntaje Final:</span>
+                        <span class="result-stat-value" id="resultFinalScore"></span>
+                    </div>
+                    <div class="result-stat">
+                        <span class="result-stat-label">💨 Carbones:</span>
+                        <span class="result-stat-value" id="resultCarbons"></span>
+                    </div>
+                    <div class="result-stat">
+                        <span class="result-stat-label">📊 Nivel:</span>
+                        <span class="result-stat-value" id="resultLevel"></span>
+                    </div>
+                    <div class="result-stat">
+                        <span class="result-stat-label">⏱️ Duración:</span>
+                        <span class="result-stat-value" id="resultDuration"></span>
+                    </div>
+                </div>
+                
+                <div class="result-buttons">
+                    <button id="playAgainBtn">🔄 Jugar de Nuevo</button>
+                    <button id="viewStatsBtn">📊 Ver Estadísticas</button>
+                    <button id="backToMenuBtn">🏠 Menú Principal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="game.js"></script>
+</body>
+</html>
