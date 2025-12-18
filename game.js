@@ -394,11 +394,53 @@ class InfotecGame {
         // Eventos del teclado
         document.addEventListener('keydown', (e) => {
             this.keys[e.key] = true;
+            // Prevenir scroll de la página con las flechas
+            if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+                e.preventDefault();
+            }
         });
         
         document.addEventListener('keyup', (e) => {
             this.keys[e.key] = false;
         });
+        
+        // Eventos de mouse para controles alternativos
+        this.canvas.addEventListener('mousemove', (e) => {
+            if (this.gameRunning && !this.gamePaused) {
+                const rect = this.canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const canvasMouseX = (mouseX / rect.width) * this.canvas.width;
+                
+                // Mover canasta hacia la posición del mouse
+                const basketCenter = this.basket.x + this.basket.width / 2;
+                if (canvasMouseX < basketCenter - 10) {
+                    this.basket.moveLeft();
+                } else if (canvasMouseX > basketCenter + 10) {
+                    this.basket.moveRight();
+                }
+            }
+        });
+        
+        // Eventos táctiles para dispositivos móviles
+        this.canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (this.gameRunning && !this.gamePaused && e.touches.length > 0) {
+                const rect = this.canvas.getBoundingClientRect();
+                const touchX = e.touches[0].clientX - rect.left;
+                const canvasTouchX = (touchX / rect.width) * this.canvas.width;
+                
+                // Mover canasta hacia la posición del toque
+                const basketCenter = this.basket.x + this.basket.width / 2;
+                if (canvasTouchX < basketCenter - 10) {
+                    this.basket.moveLeft();
+                } else if (canvasTouchX > basketCenter + 10) {
+                    this.basket.moveRight();
+                }
+            }
+        });
+        
+        // Hacer que el canvas sea focusable
+        this.canvas.setAttribute('tabindex', '0');
         
         // Eventos de botones
         document.getElementById('registerBtn').addEventListener('click', () => {
@@ -454,6 +496,52 @@ class InfotecGame {
         
         document.getElementById('resetStatsBtn').addEventListener('click', () => {
             this.resetAllStats();
+        });
+        
+        // Controles de movimiento con botones
+        document.getElementById('moveLeftBtn').addEventListener('mousedown', () => {
+            this.keys['ArrowLeft'] = true;
+        });
+        
+        document.getElementById('moveLeftBtn').addEventListener('mouseup', () => {
+            this.keys['ArrowLeft'] = false;
+        });
+        
+        document.getElementById('moveLeftBtn').addEventListener('mouseleave', () => {
+            this.keys['ArrowLeft'] = false;
+        });
+        
+        document.getElementById('moveRightBtn').addEventListener('mousedown', () => {
+            this.keys['ArrowRight'] = true;
+        });
+        
+        document.getElementById('moveRightBtn').addEventListener('mouseup', () => {
+            this.keys['ArrowRight'] = false;
+        });
+        
+        document.getElementById('moveRightBtn').addEventListener('mouseleave', () => {
+            this.keys['ArrowRight'] = false;
+        });
+        
+        // Soporte táctil para los botones
+        document.getElementById('moveLeftBtn').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            this.keys['ArrowLeft'] = true;
+        });
+        
+        document.getElementById('moveLeftBtn').addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this.keys['ArrowLeft'] = false;
+        });
+        
+        document.getElementById('moveRightBtn').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            this.keys['ArrowRight'] = true;
+        });
+        
+        document.getElementById('moveRightBtn').addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this.keys['ArrowRight'] = false;
         });
     }
     
@@ -528,6 +616,11 @@ class InfotecGame {
         document.getElementById('gameInstructions').style.display = 'block';
         document.getElementById('gameCanvas').style.display = 'block';
         document.getElementById('gameControls').style.display = 'block';
+        
+        // Asegurar que el canvas tenga foco para eventos de teclado
+        setTimeout(() => {
+            this.canvas.focus();
+        }, 100);
         
         // Iniciar cronómetro
         this.timer.start(
@@ -701,6 +794,9 @@ class InfotecGame {
         if (this.gamePaused) {
             this.drawPauseOverlay();
         }
+        
+        // Dibujar indicador de controles
+        this.drawControlsHint();
     }
     
     drawClouds() {
@@ -776,6 +872,22 @@ class InfotecGame {
         
         this.ctx.font = '20px Roboto';
         this.ctx.fillText('Presiona REANUDAR para continuar', this.canvas.width / 2, this.canvas.height / 2 + 60);
+    }
+    
+    drawControlsHint() {
+        // Mostrar indicador de controles en la esquina
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        this.ctx.fillRect(10, 10, 200, 60);
+        
+        this.ctx.fillStyle = 'white';
+        this.ctx.font = '12px Roboto';
+        this.ctx.textAlign = 'left';
+        this.ctx.fillText('Controles:', 20, 30);
+        this.ctx.fillText('← → o A/D: Mover canasta', 20, 45);
+        this.ctx.fillText('Mouse/Touch: También funciona', 20, 60);
+        
+        // Resetear alineación
+        this.ctx.textAlign = 'center';
     }
     
     togglePause() {
