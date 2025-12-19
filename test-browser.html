@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Posada Navideña INFOTEC 2024</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: white;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .pass { background: #4CAF50; }
+        .fail { background: #f44336; }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            background: #2196F3;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎮 Test del Juego INFOTEC</h1>
+    
+    <div id="test-results"></div>
+    
+    <button onclick="runTests()">🧪 Ejecutar Pruebas</button>
+    <button onclick="window.open('index.html', '_blank')">🎮 Abrir Juego</button>
+    
+    <script src="game.js"></script>
+    <script>
+        function runTests() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '';
+            
+            const tests = [
+                {
+                    name: 'Crear Teacher',
+                    test: () => {
+                        const teacher = new Teacher('test_id', 'Juan Pérez', 8);
+                        return teacher.name === 'Juan Pérez' && teacher.generation === 8;
+                    }
+                },
+                {
+                    name: 'Crear FallingObject',
+                    test: () => {
+                        const obj = new FallingObject(100, 50, 'programming', null, 10);
+                        return obj.x === 100 && obj.y === 50 && obj.points === 10;
+                    }
+                },
+                {
+                    name: 'Movimiento de Canasta',
+                    test: () => {
+                        const basket = new CollectionBasket(100, 500, 800);
+                        const initialX = basket.x;
+                        basket.moveLeft();
+                        return basket.x < initialX;
+                    }
+                },
+                {
+                    name: 'ScoreManager',
+                    test: () => {
+                        const sm = new ScoreManager();
+                        sm.addScore(50);
+                        return sm.score === 50 && sm.maxCarbons === 5;
+                    }
+                },
+                {
+                    name: 'LocalStorage Adapter',
+                    test: () => {
+                        const teacher = new Teacher('test_123', 'Test User', 7);
+                        LocalStorageAdapter.saveTeacher(teacher);
+                        const teachers = LocalStorageAdapter.getTeachers();
+                        return teachers['test_123'] && teachers['test_123'].name === 'Test User';
+                    }
+                },
+                {
+                    name: 'Canvas disponible',
+                    test: () => {
+                        const canvas = document.createElement('canvas');
+                        return canvas.getContext && canvas.getContext('2d');
+                    }
+                }
+            ];
+            
+            let passed = 0;
+            let total = tests.length;
+            
+            tests.forEach(test => {
+                try {
+                    const result = test.test();
+                    const div = document.createElement('div');
+                    div.className = `test-result ${result ? 'pass' : 'fail'}`;
+                    div.textContent = `${result ? '✅' : '❌'} ${test.name}`;
+                    results.appendChild(div);
+                    if (result) passed++;
+                } catch (error) {
+                    const div = document.createElement('div');
+                    div.className = 'test-result fail';
+                    div.textContent = `❌ ${test.name} - Error: ${error.message}`;
+                    results.appendChild(div);
+                }
+            });
+            
+            const summary = document.createElement('div');
+            summary.className = `test-result ${passed === total ? 'pass' : 'fail'}`;
+            summary.innerHTML = `<strong>Resumen: ${passed}/${total} pruebas pasaron</strong>`;
+            results.appendChild(summary);
+            
+            if (passed === total) {
+                const success = document.createElement('div');
+                success.className = 'test-result pass';
+                success.innerHTML = '<strong>🎉 ¡Todas las pruebas pasaron! El juego está listo para usar.</strong>';
+                results.appendChild(success);
+            }
+        }
+        
+        // Ejecutar pruebas automáticamente al cargar
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+</html>

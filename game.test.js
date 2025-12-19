@@ -1,8 +1,16 @@
 const fc = require('fast-check');
 
-// Importar las clases del juego (simulando un entorno de módulos)
-// En un entorno real, estas clases estarían en módulos separados
-eval(require('fs').readFileSync('game.js', 'utf8'));
+// Importar las clases del juego
+const {
+    Teacher,
+    GameResult,
+    FallingObject,
+    CollectionBasket,
+    ScoreManager,
+    LocalStorageAdapter,
+    GameTimer,
+    InfotecGame
+} = require('./game.js');
 
 describe('INFOTEC Teacher Game Tests', () => {
     
@@ -177,6 +185,7 @@ describe('INFOTEC Teacher Game Tests', () => {
             const scoreManager = new ScoreManager();
             expect(scoreManager.score).toBe(0);
             expect(scoreManager.carbonCount).toBe(0);
+            expect(scoreManager.maxCarbons).toBe(5);
             
             scoreManager.addScore(50);
             expect(scoreManager.score).toBe(50);
@@ -185,10 +194,13 @@ describe('INFOTEC Teacher Game Tests', () => {
             expect(scoreManager.carbonCount).toBe(1);
             expect(gameOver).toBe(false);
             
-            scoreManager.addCarbon();
-            scoreManager.addCarbon();
-            const gameOverNow = scoreManager.addCarbon();
+            // Agregar carbones hasta llegar al límite (5)
+            scoreManager.addCarbon(); // 2
+            scoreManager.addCarbon(); // 3
+            scoreManager.addCarbon(); // 4
+            const gameOverNow = scoreManager.addCarbon(); // 5
             expect(gameOverNow).toBe(true);
+            expect(scoreManager.carbonCount).toBe(5);
         });
     });
 });

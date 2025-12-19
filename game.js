@@ -68,7 +68,7 @@ class CollectionBasket {
         this.y = y;
         this.width = 80;
         this.height = 60;
-        this.speed = 5;
+        this.speed = 8; // Aumentado para mejor respuesta
         this.canvasWidth = canvasWidth;
     }
     
@@ -285,8 +285,8 @@ class InfotecGame {
         this.gameStartTime = null;
         this.currentTeacher = null;
         this.keys = {};
-        this.spawnRate = 1500; // Velocidad inicial de aparición
-        this.objectSpeed = 2; // Velocidad inicial de caída
+        this.spawnRate = 1000; // Velocidad inicial de aparición muy rápida
+        this.objectSpeed = 3; // Velocidad inicial de caída más rápida
         
         this.initializeImages();
         this.setupEventListeners();
@@ -325,66 +325,95 @@ class InfotecGame {
     }
     
     createEnhancedSprites() {
-        // Función mejorada para crear sprites con mejor diseño
+        // Configurar polyfill para roundRect
+        this.setupCanvasPolyfill();
+        
+        // Función optimizada para crear sprites
         const createSprite = (bgColor, text, textColor = 'white', fontSize = 16, emoji = false) => {
             const canvas = document.createElement('canvas');
-            canvas.width = 50;
-            canvas.height = 50;
+            canvas.width = 60;
+            canvas.height = 60;
             const ctx = canvas.getContext('2d');
             
-            // Fondo con gradiente
-            const gradient = ctx.createLinearGradient(0, 0, 50, 50);
+            // Fondo con gradiente optimizado
+            const gradient = ctx.createLinearGradient(0, 0, 60, 60);
             gradient.addColorStop(0, bgColor);
             gradient.addColorStop(1, this.adjustBrightness(bgColor, -20));
             
             ctx.fillStyle = gradient;
-            ctx.roundRect(0, 0, 50, 50, 8);
+            this.drawRoundRect(ctx, 0, 0, 60, 60, 10);
             ctx.fill();
             
             // Borde brillante
             ctx.strokeStyle = this.adjustBrightness(bgColor, 30);
-            ctx.lineWidth = 2;
-            ctx.roundRect(1, 1, 48, 48, 7);
+            ctx.lineWidth = 3;
+            this.drawRoundRect(ctx, 2, 2, 56, 56, 8);
             ctx.stroke();
             
-            // Sombra interna
-            ctx.strokeStyle = this.adjustBrightness(bgColor, -40);
-            ctx.lineWidth = 1;
-            ctx.roundRect(2, 2, 46, 46, 6);
-            ctx.stroke();
-            
-            // Texto o emoji
+            // Texto o emoji centrado
             ctx.fillStyle = textColor;
-            ctx.font = emoji ? `${fontSize + 4}px Arial` : `bold ${fontSize}px Arial`;
+            ctx.font = emoji ? `${fontSize + 6}px Arial` : `bold ${fontSize}px Arial`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(text, 25, 25);
+            
+            // Sombra del texto para mejor legibilidad
+            ctx.shadowColor = 'rgba(0,0,0,0.5)';
+            ctx.shadowBlur = 2;
+            ctx.shadowOffsetX = 1;
+            ctx.shadowOffsetY = 1;
+            
+            ctx.fillText(text, 30, 30);
+            
+            // Resetear sombra
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
             
             const img = new Image();
             img.src = canvas.toDataURL();
             return img;
         };
         
-        // Crear todos los logos con mejor diseño
-        this.images.javascript = createSprite('#f7df1e', 'JS', 'black', 14);
-        this.images.python = createSprite('#3776ab', 'PY', 'white', 14);
-        this.images.java = createSprite('#ed8b00', '☕', 'white', 20, true);
-        this.images.react = createSprite('#61dafb', '⚛', 'black', 22, true);
-        this.images.nodejs = createSprite('#339933', 'NODE', 'white', 10);
-        this.images.csharp = createSprite('#239120', 'C#', 'white', 14);
-        this.images.cpp = createSprite('#00599c', 'C++', 'white', 12);
-        this.images.php = createSprite('#777bb4', 'PHP', 'white', 12);
-        this.images.html = createSprite('#e34f26', 'HTML', 'white', 10);
-        this.images.css = createSprite('#1572b6', 'CSS', 'white', 12);
-        this.images.carbon = createSprite('#333333', '💨', 'white', 20, true);
+        // Crear logos de programación con colores oficiales
+        this.images.javascript = createSprite('#f7df1e', 'JS', 'black', 16);
+        this.images.python = createSprite('#3776ab', 'PY', 'white', 16);
+        this.images.java = createSprite('#ed8b00', '☕', 'white', 22, true);
+        this.images.react = createSprite('#61dafb', '⚛', 'black', 24, true);
+        this.images.nodejs = createSprite('#339933', 'NODE', 'white', 11);
+        this.images.csharp = createSprite('#239120', 'C#', 'white', 16);
+        this.images.cpp = createSprite('#00599c', 'C++', 'white', 14);
+        this.images.php = createSprite('#777bb4', 'PHP', 'white', 14);
+        this.images.html = createSprite('#e34f26', 'HTML', 'white', 11);
+        this.images.css = createSprite('#1572b6', 'CSS', 'white', 14);
+        this.images.carbon = createSprite('#333333', '💨', 'white', 22, true);
         
-        // Crear objetos navideños
-        this.images.gift = createSprite('#ff6b6b', '🎁', 'white', 24, true);
-        this.images.star = createSprite('#FFD700', '⭐', 'white', 24, true);
-        this.images.bell = createSprite('#FFD700', '🔔', 'white', 24, true);
-        this.images.candy = createSprite('#ff6b6b', '🍭', 'white', 24, true);
-        this.images.snowflake = createSprite('#87CEEB', '❄️', 'white', 24, true);
-        this.images.grinch = createSprite('#4CAF50', '👹', 'white', 24, true);
+        // Crear objetos navideños especiales
+        this.images.gift = createSprite('#dc2626', '🎁', 'white', 26, true);
+        this.images.star = createSprite('#fbbf24', '⭐', 'white', 26, true);
+        this.images.bell = createSprite('#f59e0b', '🔔', 'white', 26, true);
+        this.images.candy = createSprite('#ec4899', '🍭', 'white', 26, true);
+        this.images.snowflake = createSprite('#60a5fa', '❄️', 'white', 26, true);
+        this.images.grinch = createSprite('#16a34a', '👹', 'white', 26, true);
+    }
+    
+    drawRoundRect(ctx, x, y, width, height, radius) {
+        if (ctx.roundRect) {
+            ctx.roundRect(x, y, width, height, radius);
+        } else {
+            // Fallback manual
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
     }
     
     adjustBrightness(color, amount) {
@@ -431,43 +460,46 @@ class InfotecGame {
             this.keys[e.key] = false;
         });
         
-        // Eventos de mouse para controles alternativos
+        // Eventos de mouse mejorados
         this.canvas.addEventListener('mousemove', (e) => {
             if (this.gameRunning && !this.gamePaused) {
                 const rect = this.canvas.getBoundingClientRect();
                 const mouseX = e.clientX - rect.left;
                 const canvasMouseX = (mouseX / rect.width) * this.canvas.width;
                 
-                // Mover canasta hacia la posición del mouse
-                const basketCenter = this.basket.x + this.basket.width / 2;
-                if (canvasMouseX < basketCenter - 10) {
-                    this.basket.moveLeft();
-                } else if (canvasMouseX > basketCenter + 10) {
-                    this.basket.moveRight();
-                }
+                // Posicionar canasta directamente en la posición del mouse
+                this.basket.x = Math.max(0, Math.min(this.canvas.width - this.basket.width, canvasMouseX - this.basket.width / 2));
             }
         });
         
-        // Eventos táctiles para dispositivos móviles
+        // Eventos táctiles mejorados para dispositivos móviles
+        this.canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            this.handleTouchMove(e);
+        });
+        
         this.canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
-            if (this.gameRunning && !this.gamePaused && e.touches.length > 0) {
-                const rect = this.canvas.getBoundingClientRect();
-                const touchX = e.touches[0].clientX - rect.left;
-                const canvasTouchX = (touchX / rect.width) * this.canvas.width;
-                
-                // Mover canasta hacia la posición del toque
-                const basketCenter = this.basket.x + this.basket.width / 2;
-                if (canvasTouchX < basketCenter - 10) {
-                    this.basket.moveLeft();
-                } else if (canvasTouchX > basketCenter + 10) {
-                    this.basket.moveRight();
-                }
-            }
+            this.handleTouchMove(e);
+        });
+        
+        this.canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
         });
         
         // Hacer que el canvas sea focusable
         this.canvas.setAttribute('tabindex', '0');
+    }
+    
+    handleTouchMove(e) {
+        if (this.gameRunning && !this.gamePaused && e.touches.length > 0) {
+            const rect = this.canvas.getBoundingClientRect();
+            const touchX = e.touches[0].clientX - rect.left;
+            const canvasTouchX = (touchX / rect.width) * this.canvas.width;
+            
+            // Posicionar canasta directamente en la posición del toque
+            this.basket.x = Math.max(0, Math.min(this.canvas.width - this.basket.width, canvasTouchX - this.basket.width / 2));
+        }
         
         // Eventos de botones
         document.getElementById('registerBtn').addEventListener('click', () => {
@@ -525,50 +557,50 @@ class InfotecGame {
             this.resetAllStats();
         });
         
-        // Controles de movimiento con botones
-        document.getElementById('moveLeftBtn').addEventListener('mousedown', () => {
-            this.keys['ArrowLeft'] = true;
-        });
+        // Controles de movimiento mejorados para botones
+        this.setupButtonControls('moveLeftBtn', 'ArrowLeft');
+        this.setupButtonControls('moveRightBtn', 'ArrowRight');
+    }
+    
+    setupButtonControls(buttonId, keyCode) {
+        const button = document.getElementById(buttonId);
         
-        document.getElementById('moveLeftBtn').addEventListener('mouseup', () => {
-            this.keys['ArrowLeft'] = false;
-        });
-        
-        document.getElementById('moveLeftBtn').addEventListener('mouseleave', () => {
-            this.keys['ArrowLeft'] = false;
-        });
-        
-        document.getElementById('moveRightBtn').addEventListener('mousedown', () => {
-            this.keys['ArrowRight'] = true;
-        });
-        
-        document.getElementById('moveRightBtn').addEventListener('mouseup', () => {
-            this.keys['ArrowRight'] = false;
-        });
-        
-        document.getElementById('moveRightBtn').addEventListener('mouseleave', () => {
-            this.keys['ArrowRight'] = false;
-        });
-        
-        // Soporte táctil para los botones
-        document.getElementById('moveLeftBtn').addEventListener('touchstart', (e) => {
+        // Eventos de mouse
+        button.addEventListener('mousedown', (e) => {
             e.preventDefault();
-            this.keys['ArrowLeft'] = true;
+            this.keys[keyCode] = true;
         });
         
-        document.getElementById('moveLeftBtn').addEventListener('touchend', (e) => {
+        button.addEventListener('mouseup', (e) => {
             e.preventDefault();
-            this.keys['ArrowLeft'] = false;
+            this.keys[keyCode] = false;
         });
         
-        document.getElementById('moveRightBtn').addEventListener('touchstart', (e) => {
+        button.addEventListener('mouseleave', (e) => {
             e.preventDefault();
-            this.keys['ArrowRight'] = true;
+            this.keys[keyCode] = false;
         });
         
-        document.getElementById('moveRightBtn').addEventListener('touchend', (e) => {
+        // Eventos táctiles optimizados
+        button.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            this.keys['ArrowRight'] = false;
+            e.stopPropagation();
+            this.keys[keyCode] = true;
+            button.style.transform = 'scale(0.95)';
+        });
+        
+        button.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.keys[keyCode] = false;
+            button.style.transform = 'scale(1)';
+        });
+        
+        button.addEventListener('touchcancel', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.keys[keyCode] = false;
+            button.style.transform = 'scale(1)';
         });
     }
     
@@ -631,8 +663,8 @@ class InfotecGame {
         this.scoreManager.reset();
         this.timer.reset();
         this.fallingObjects = [];
-        this.spawnRate = 1500;
-        this.objectSpeed = 2;
+        this.spawnRate = 1000;
+        this.objectSpeed = 3;
         
         // Configurar polyfill para canvas
         this.setupCanvasPolyfill();
@@ -652,10 +684,12 @@ class InfotecGame {
         // Iniciar cronómetro
         this.timer.start(
             (timeLeft) => {
-                // Aumentar dificultad con el tiempo
-                if (timeLeft === 45) this.increaseDifficulty();
+                // Aumentar dificultad con el tiempo (más frecuente)
+                if (timeLeft === 50) this.increaseDifficulty();
+                if (timeLeft === 40) this.increaseDifficulty();
                 if (timeLeft === 30) this.increaseDifficulty();
-                if (timeLeft === 15) this.increaseDifficulty();
+                if (timeLeft === 20) this.increaseDifficulty();
+                if (timeLeft === 10) this.increaseDifficulty();
             },
             () => {
                 // Tiempo agotado
@@ -668,8 +702,8 @@ class InfotecGame {
     }
     
     increaseDifficulty() {
-        this.spawnRate = Math.max(800, this.spawnRate - 200);
-        this.objectSpeed = Math.min(5, this.objectSpeed + 0.5);
+        this.spawnRate = Math.max(400, this.spawnRate - 200); // Spawn más rápido
+        this.objectSpeed = Math.min(7, this.objectSpeed + 0.8); // Velocidad más alta
         
         // Actualizar velocidad de objetos existentes
         this.fallingObjects.forEach(obj => {
@@ -687,31 +721,42 @@ class InfotecGame {
     }
     
     update() {
-        // Mover canasta
+        // Mover canasta con controles de teclado (más suave)
         if (this.keys['ArrowLeft'] || this.keys['a'] || this.keys['A']) {
             this.basket.moveLeft();
+            this.basket.moveLeft(); // Doble movimiento para mayor velocidad
         }
         if (this.keys['ArrowRight'] || this.keys['d'] || this.keys['D']) {
             this.basket.moveRight();
+            this.basket.moveRight(); // Doble movimiento para mayor velocidad
         }
         
-        // Actualizar objetos que caen
+        // Actualizar objetos que caen (optimizado)
         for (let i = this.fallingObjects.length - 1; i >= 0; i--) {
             const obj = this.fallingObjects[i];
             obj.update();
             
-            // Verificar colisión con canasta
-            if (obj.collidesWith(this.basket)) {
+            // Verificar colisión con canasta (hitbox mejorada)
+            if (this.checkCollision(obj, this.basket)) {
                 this.collectObject(obj);
                 this.fallingObjects.splice(i, 1);
                 continue;
             }
             
             // Remover objetos fuera de pantalla
-            if (obj.isOffScreen(this.canvas.height)) {
+            if (obj.y > this.canvas.height + 50) {
                 this.fallingObjects.splice(i, 1);
             }
         }
+    }
+    
+    checkCollision(obj, basket) {
+        // Hitbox más generosa para mejor jugabilidad
+        const margin = 5;
+        return obj.x < basket.x + basket.width + margin &&
+               obj.x + obj.width > basket.x - margin &&
+               obj.y < basket.y + basket.height + margin &&
+               obj.y + obj.height > basket.y - margin;
     }
     
     collectObject(obj) {
@@ -766,31 +811,31 @@ class InfotecGame {
         if (!this.gameRunning || this.gamePaused) return;
         
         const objectTypes = [
-            // Logos de programación
-            { type: 'programming', sprite: this.images.javascript, points: 10, weight: 12 },
-            { type: 'programming', sprite: this.images.python, points: 15, weight: 12 },
-            { type: 'programming', sprite: this.images.java, points: 12, weight: 12 },
-            { type: 'programming', sprite: this.images.react, points: 18, weight: 10 },
-            { type: 'programming', sprite: this.images.nodejs, points: 14, weight: 10 },
-            { type: 'programming', sprite: this.images.csharp, points: 16, weight: 8 },
-            { type: 'programming', sprite: this.images.cpp, points: 20, weight: 6 },
-            { type: 'programming', sprite: this.images.php, points: 8, weight: 8 },
-            { type: 'programming', sprite: this.images.html, points: 6, weight: 10 },
-            { type: 'programming', sprite: this.images.css, points: 8, weight: 10 },
+            // Logos de programación (mayor peso para que aparezcan más)
+            { type: 'programming', sprite: this.images.javascript, points: 10, weight: 15 },
+            { type: 'programming', sprite: this.images.python, points: 15, weight: 15 },
+            { type: 'programming', sprite: this.images.java, points: 12, weight: 15 },
+            { type: 'programming', sprite: this.images.react, points: 18, weight: 12 },
+            { type: 'programming', sprite: this.images.nodejs, points: 14, weight: 12 },
+            { type: 'programming', sprite: this.images.csharp, points: 16, weight: 10 },
+            { type: 'programming', sprite: this.images.cpp, points: 20, weight: 8 },
+            { type: 'programming', sprite: this.images.php, points: 8, weight: 12 },
+            { type: 'programming', sprite: this.images.html, points: 6, weight: 15 },
+            { type: 'programming', sprite: this.images.css, points: 8, weight: 15 },
             
             // Objetos especiales
-            { type: 'infotec', sprite: this.images.infotec, points: 50, weight: 6 },
+            { type: 'infotec', sprite: this.images.infotec, points: 50, weight: 8 },
             
-            // Objetos navideños (buenos)
-            { type: 'christmas', sprite: this.images.gift, points: 25, weight: 15 },
-            { type: 'christmas', sprite: this.images.star, points: 30, weight: 12 },
-            { type: 'christmas', sprite: this.images.bell, points: 20, weight: 15 },
-            { type: 'christmas', sprite: this.images.candy, points: 15, weight: 18 },
-            { type: 'christmas', sprite: this.images.snowflake, points: 10, weight: 20 },
+            // Objetos navideños (buenos) - mayor peso
+            { type: 'christmas', sprite: this.images.gift, points: 25, weight: 20 },
+            { type: 'christmas', sprite: this.images.star, points: 30, weight: 18 },
+            { type: 'christmas', sprite: this.images.bell, points: 20, weight: 20 },
+            { type: 'christmas', sprite: this.images.candy, points: 15, weight: 22 },
+            { type: 'christmas', sprite: this.images.snowflake, points: 10, weight: 25 },
             
-            // Objetos negativos
-            { type: 'carbon', sprite: this.images.carbon, points: 0, weight: 35 },
-            { type: 'grinch', sprite: this.images.grinch, points: 0, weight: 15 } // Nuevo objeto negativo navideño
+            // Objetos negativos (peso aumentado para mayor dificultad)
+            { type: 'carbon', sprite: this.images.carbon, points: 0, weight: 45 },
+            { type: 'grinch', sprite: this.images.grinch, points: 0, weight: 20 }
         ];
         
         // Seleccionar tipo de objeto basado en pesos
@@ -806,16 +851,35 @@ class InfotecGame {
             }
         }
         
-        const x = Math.random() * (this.canvas.width - 50);
-        const obj = new FallingObject(x, -50, selectedType.type, selectedType.sprite, selectedType.points);
+        const objSize = 55; // Tamaño más grande para mejor visibilidad
+        const x = Math.random() * (this.canvas.width - objSize);
+        const obj = new FallingObject(x, -objSize, selectedType.type, selectedType.sprite, selectedType.points);
         obj.speed = this.objectSpeed;
-        obj.width = 50;
-        obj.height = 50;
+        obj.width = objSize;
+        obj.height = objSize;
         this.fallingObjects.push(obj);
+        
+        // Ocasionalmente crear ráfagas de carbones (10% de probabilidad)
+        if (Math.random() < 0.1 && selectedType.type === 'carbon') {
+            // Crear 2-3 carbones adicionales en ráfaga
+            const burstCount = Math.floor(Math.random() * 2) + 2;
+            for (let i = 0; i < burstCount; i++) {
+                setTimeout(() => {
+                    if (this.gameRunning && !this.gamePaused) {
+                        const burstX = Math.random() * (this.canvas.width - objSize);
+                        const burstObj = new FallingObject(burstX, -objSize - (i * 30), 'carbon', this.images.carbon, 0);
+                        burstObj.speed = this.objectSpeed;
+                        burstObj.width = objSize;
+                        burstObj.height = objSize;
+                        this.fallingObjects.push(burstObj);
+                    }
+                }, i * 200); // Espaciado de 200ms entre carbones de la ráfaga
+            }
+        }
         
         // Programar siguiente objeto con velocidad variable
         const baseDelay = this.spawnRate;
-        const randomVariation = Math.random() * 500;
+        const randomVariation = Math.random() * 300; // Reducido para más variabilidad
         const delay = baseDelay + randomVariation;
         
         setTimeout(() => this.spawnObjects(), delay);
@@ -1010,9 +1074,11 @@ class InfotecGame {
             pauseBtn.textContent = '⏸️ PAUSAR';
             this.timer.start(
                 (timeLeft) => {
-                    if (timeLeft === 45) this.increaseDifficulty();
+                    if (timeLeft === 50) this.increaseDifficulty();
+                    if (timeLeft === 40) this.increaseDifficulty();
                     if (timeLeft === 30) this.increaseDifficulty();
-                    if (timeLeft === 15) this.increaseDifficulty();
+                    if (timeLeft === 20) this.increaseDifficulty();
+                    if (timeLeft === 10) this.increaseDifficulty();
                 },
                 () => this.endGame('¡Tiempo agotado!')
             );
@@ -1372,3 +1438,17 @@ class InfotecGame {
 document.addEventListener('DOMContentLoaded', () => {
     new InfotecGame();
 });
+
+// Exportar clases para pruebas (solo en entorno de pruebas)
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        Teacher,
+        GameResult,
+        FallingObject,
+        CollectionBasket,
+        ScoreManager,
+        LocalStorageAdapter,
+        GameTimer,
+        InfotecGame
+    };
+}

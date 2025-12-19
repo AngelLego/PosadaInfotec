@@ -2,7 +2,10 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>🎄 INFOTEC - Posada Navideña 2024 🎅</title>
     <link rel="icon" type="image/png" href="imagenes/Infotec-logo.png">
     <link rel="shortcut icon" type="image/png" href="imagenes/Infotec-logo.png">
@@ -90,6 +93,27 @@
             box-shadow: 0 0 30px rgba(0, 212, 255, 0.5), inset 0 0 20px rgba(0,0,0,0.2);
             display: none;
             position: relative;
+            max-width: 100%;
+            height: auto;
+            touch-action: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        /* Responsividad para móviles */
+        @media (max-width: 850px) {
+            #gameCanvas {
+                width: 95vw;
+                max-width: 95vw;
+            }
+            
+            .container {
+                padding: 10px;
+            }
         }
         
         .menu {
@@ -497,36 +521,55 @@
             background: linear-gradient(45deg, #ff5252, #ff1744) !important;
         }
         
-        /* Controles de movimiento */
+        /* Controles de movimiento mejorados */
         .movement-controls {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 30px;
             margin-bottom: 15px;
         }
         
         .control-btn {
-            width: 60px !important;
-            height: 60px !important;
+            width: 70px !important;
+            height: 70px !important;
             border-radius: 50% !important;
-            font-size: 24px !important;
+            font-size: 28px !important;
             min-width: auto !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
             background: linear-gradient(45deg, #2196F3, #1976D2) !important;
-            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3) !important;
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4) !important;
+            border: 3px solid rgba(255, 255, 255, 0.2) !important;
+            transition: all 0.1s ease !important;
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            -webkit-tap-highlight-color: transparent !important;
         }
         
         .control-btn:hover {
             background: linear-gradient(45deg, #1976D2, #1565C0) !important;
-            transform: translateY(-2px) !important;
-            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4) !important;
+            transform: translateY(-3px) scale(1.05) !important;
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.5) !important;
         }
         
         .control-btn:active {
-            transform: translateY(0) !important;
-            box-shadow: 0 2px 10px rgba(33, 150, 243, 0.3) !important;
+            transform: translateY(1px) scale(0.95) !important;
+            box-shadow: 0 3px 15px rgba(33, 150, 243, 0.4) !important;
+        }
+        
+        /* Mejoras para dispositivos táctiles */
+        @media (hover: none) and (pointer: coarse) {
+            .control-btn {
+                width: 80px !important;
+                height: 80px !important;
+                font-size: 32px !important;
+            }
+            
+            .control-btn:active {
+                transform: scale(0.9) !important;
+                background: linear-gradient(45deg, #1565C0, #0d47a1) !important;
+            }
         }
         
         .game-buttons {
@@ -626,7 +669,7 @@
 <body>
     <div class="container">
         <img src="imagenes/Infotec-logo.png" alt="INFOTEC Logo" class="header-logo">
-        <h1>🎄 POSADA NAVIDEÑA INFOTEC 2024 🎅</h1>
+        <h1>🎄 POSADA NAVIDEÑA INFOTEC 2025 🎅</h1>
         
         <!-- Menú de registro -->
         <div id="registrationMenu" class="menu">
@@ -689,8 +732,10 @@
                 <li><strong>🎯 Objetivo:</strong> Recolecta logos de programación y objetos navideños</li>
                 <li><strong>🎄 Especiales:</strong> Regalos, estrellas, campanas, dulces y copos de nieve</li>
                 <li><strong>🏫 INFOTEC:</strong> Logo institucional otorga puntos dobles</li>
-                <li><strong>⚠️ Evita:</strong> Carbón (máximo 5) y el Grinch (roba puntos)</li>
-                <li><strong>⏰ Tiempo:</strong> 1 minuto de diversión navideña</li>
+                <li><strong>⚠️ PELIGRO:</strong> Carbón (máximo 5) - ¡Aparecen en ráfagas!</li>
+                <li><strong>👹 Grinch:</strong> Roba puntos - ¡Más frecuente ahora!</li>
+                <li><strong>⏰ Tiempo:</strong> 1 minuto de desafío extremo</li>
+                <li><strong>📈 Dificultad:</strong> Aumenta cada 10 segundos</li>
             </ul>
             
             <div class="control-instructions">
@@ -723,11 +768,11 @@
                 </div>
                 <div class="logo-item">
                     <div style="width: 30px; height: 30px; background: #333; border-radius: 4px; display: flex; align-items: center; justify-content: center;">💨</div>
-                    <span>¡EVITAR!</span>
+                    <span>¡RÁFAGAS!</span>
                 </div>
                 <div class="logo-item">
                     <div style="width: 30px; height: 30px; background: #4CAF50; border-radius: 4px; display: flex; align-items: center; justify-content: center;">👹</div>
-                    <span>¡ROBA PUNTOS!</span>
+                    <span>¡MÁS GRINCH!</span>
                 </div>
             </div>
         </div>
@@ -809,7 +854,7 @@
         
         <!-- Footer de créditos -->
         <div class="footer">
-            <h3>🎄 Desarrollado con ❤️ para la Posada Navideña INFOTEC 2024 🎄</h3>
+            <h3>🎄 Desarrollado con ❤️ para la Posada Navideña INFOTEC 2025 🎄</h3>
             
             <div class="developers">
                 <div class="developer">
