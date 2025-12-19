@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Botones INFOTEC</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: white;
+        }
+        .debug-section {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+        .error { color: #ff6b6b; }
+        .success { color: #4CAF50; }
+        .warning { color: #ffa726; }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            background: #2196F3;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #1976D2;
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Debug - Botones del Juego INFOTEC</h1>
+    
+    <div class="debug-section">
+        <h2>1. Verificación de Elementos HTML</h2>
+        <div id="html-check"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>2. Prueba de Botones</h2>
+        <button id="registerBtn">Registrarse</button>
+        <button id="startGameBtn" disabled>Iniciar Juego</button>
+        <button id="showStatsBtn">📊 Ver Estadísticas</button>
+        <button id="resetStatsBtn">🗑️ Restablecer Datos</button>
+        <div id="button-test"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>3. Formulario de Registro</h2>
+        <input type="text" id="teacherName" placeholder="Nombre del docente">
+        <select id="teacherGeneration">
+            <option value="">Selecciona generación</option>
+            <option value="8">Generación 8</option>
+            <option value="9">Generación 9</option>
+        </select>
+        <div id="registrationMessage"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>4. Errores de JavaScript</h2>
+        <div id="js-errors"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>5. Estado del Juego</h2>
+        <div id="game-state"></div>
+    </div>
+    
+    <script>
+        // Capturar errores de JavaScript
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            const errorDiv = document.getElementById('js-errors');
+            errorDiv.innerHTML += `<div class="error">❌ Error: ${msg} (Línea: ${lineNo})</div>`;
+            return false;
+        };
+        
+        // Verificar elementos HTML
+        function checkHTML() {
+            const elements = ['registerBtn', 'startGameBtn', 'showStatsBtn', 'resetStatsBtn', 'teacherName', 'teacherGeneration'];
+            const htmlCheck = document.getElementById('html-check');
+            
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    htmlCheck.innerHTML += `<div class="success">✅ ${id} encontrado</div>`;
+                } else {
+                    htmlCheck.innerHTML += `<div class="error">❌ ${id} NO encontrado</div>`;
+                }
+            });
+        }
+        
+        // Probar botones manualmente
+        function setupTestButtons() {
+            const buttonTest = document.getElementById('button-test');
+            
+            document.getElementById('registerBtn').addEventListener('click', () => {
+                buttonTest.innerHTML += '<div class="success">✅ Botón Registrarse funciona</div>';
+                
+                const name = document.getElementById('teacherName').value;
+                const generation = document.getElementById('teacherGeneration').value;
+                
+                if (name && generation) {
+                    document.getElementById('startGameBtn').disabled = false;
+                    buttonTest.innerHTML += '<div class="success">✅ Botón Iniciar Juego habilitado</div>';
+                } else {
+                    buttonTest.innerHTML += '<div class="warning">⚠️ Completa nombre y generación</div>';
+                }
+            });
+            
+            document.getElementById('startGameBtn').addEventListener('click', () => {
+                buttonTest.innerHTML += '<div class="success">✅ Botón Iniciar Juego funciona</div>';
+            });
+            
+            document.getElementById('showStatsBtn').addEventListener('click', () => {
+                buttonTest.innerHTML += '<div class="success">✅ Botón Ver Estadísticas funciona</div>';
+            });
+            
+            document.getElementById('resetStatsBtn').addEventListener('click', () => {
+                buttonTest.innerHTML += '<div class="success">✅ Botón Restablecer Datos funciona</div>';
+            });
+        }
+        
+        // Verificar si el juego se carga
+        function checkGameState() {
+            const gameState = document.getElementById('game-state');
+            
+            // Intentar cargar el script del juego
+            const script = document.createElement('script');
+            script.src = 'game.js';
+            script.onload = () => {
+                gameState.innerHTML += '<div class="success">✅ game.js cargado correctamente</div>';
+                
+                // Verificar si las clases existen
+                try {
+                    if (typeof Teacher !== 'undefined') {
+                        gameState.innerHTML += '<div class="success">✅ Clase Teacher disponible</div>';
+                    }
+                    if (typeof InfotecGame !== 'undefined') {
+                        gameState.innerHTML += '<div class="success">✅ Clase InfotecGame disponible</div>';
+                    }
+                } catch (e) {
+                    gameState.innerHTML += `<div class="error">❌ Error al verificar clases: ${e.message}</div>`;
+                }
+            };
+            script.onerror = () => {
+                gameState.innerHTML += '<div class="error">❌ Error al cargar game.js</div>';
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Ejecutar diagnósticos
+        window.addEventListener('load', () => {
+            checkHTML();
+            setupTestButtons();
+            checkGameState();
+        });
+    </script>
+</body>
+</html>

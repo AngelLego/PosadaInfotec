@@ -489,19 +489,8 @@ class InfotecGame {
         
         // Hacer que el canvas sea focusable
         this.canvas.setAttribute('tabindex', '0');
-    }
-    
-    handleTouchMove(e) {
-        if (this.gameRunning && !this.gamePaused && e.touches.length > 0) {
-            const rect = this.canvas.getBoundingClientRect();
-            const touchX = e.touches[0].clientX - rect.left;
-            const canvasTouchX = (touchX / rect.width) * this.canvas.width;
-            
-            // Posicionar canasta directamente en la posición del toque
-            this.basket.x = Math.max(0, Math.min(this.canvas.width - this.basket.width, canvasTouchX - this.basket.width / 2));
-        }
         
-        // Eventos de botones
+        // Eventos de botones del menú principal
         document.getElementById('registerBtn').addEventListener('click', () => {
             this.registerTeacher();
         });
@@ -560,6 +549,17 @@ class InfotecGame {
         // Controles de movimiento mejorados para botones
         this.setupButtonControls('moveLeftBtn', 'ArrowLeft');
         this.setupButtonControls('moveRightBtn', 'ArrowRight');
+    }
+    
+    handleTouchMove(e) {
+        if (this.gameRunning && !this.gamePaused && e.touches.length > 0) {
+            const rect = this.canvas.getBoundingClientRect();
+            const touchX = e.touches[0].clientX - rect.left;
+            const canvasTouchX = (touchX / rect.width) * this.canvas.width;
+            
+            // Posicionar canasta directamente en la posición del toque
+            this.basket.x = Math.max(0, Math.min(this.canvas.width - this.basket.width, canvasTouchX - this.basket.width / 2));
+        }
     }
     
     setupButtonControls(buttonId, keyCode) {
